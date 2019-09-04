@@ -43,6 +43,7 @@ namespace dawn_native {
                                 BufferBase* destination,
                                 uint64_t destinationOffset,
                                 uint64_t size);
+        void ShareBufferToWebml(BufferBase* source, uint32_t index);
         void CopyBufferToTexture(const BufferCopyView* source,
                                  const TextureCopyView* destination,
                                  const Extent3D* copySize);

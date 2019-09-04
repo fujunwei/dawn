@@ -35,6 +35,7 @@ namespace dawn_native {
         BeginComputePass,
         BeginRenderPass,
         CopyBufferToBuffer,
+        ShareBufferToWebml,
         CopyBufferToTexture,
         CopyTextureToBuffer,
         CopyTextureToTexture,
@@ -111,6 +112,11 @@ namespace dawn_native {
         Ref<BufferBase> destination;
         uint64_t destinationOffset;
         uint64_t size;
+    };
+
+    struct ShareBufferToWebmlCmd {
+        Ref<BufferBase> source;
+        uint32_t index;
     };
 
     struct CopyBufferToTextureCmd {

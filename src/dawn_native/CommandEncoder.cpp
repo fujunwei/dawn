@@ -580,6 +580,19 @@ namespace dawn_native {
         });
     }
 
+    void CommandEncoderBase::ShareBufferToWebml(BufferBase* source, uint32_t index) {
+        mEncodingContext.TryEncode(this, [&](CommandAllocator* allocator) -> MaybeError {
+            DAWN_TRY(GetDevice()->ValidateObject(source));
+
+            ShareBufferToWebmlCmd* copy =
+                allocator->Allocate<ShareBufferToWebmlCmd>(Command::ShareBufferToWebml);
+            copy->source = source;
+            copy->index = index;
+
+            return {};
+        });
+    }
+
     void CommandEncoderBase::CopyBufferToTexture(const BufferCopyView* source,
                                                  const TextureCopyView* destination,
                                                  const Extent3D* copySize) {
@@ -721,6 +734,12 @@ namespace dawn_native {
 
                     mResourceUsages.topLevelBuffers.insert(copy->source.Get());
                     mResourceUsages.topLevelBuffers.insert(copy->destination.Get());
+                } break;
+
+                case Command::ShareBufferToWebml: {
+                    ShareBufferToWebmlCmd* copy = commands->NextCommand<ShareBufferToWebmlCmd>();
+
+                    mResourceUsages.topLevelBuffers.insert(copy->source.Get());
                 } break;
 
                 case Command::CopyBufferToTexture: {

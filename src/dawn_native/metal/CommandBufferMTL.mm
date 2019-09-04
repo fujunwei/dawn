@@ -14,6 +14,8 @@
 
 #include "dawn_native/metal/CommandBufferMTL.h"
 
+#include <map>
+
 #include "dawn_native/BindGroup.h"
 #include "dawn_native/CommandEncoder.h"
 #include "dawn_native/Commands.h"
@@ -25,8 +27,12 @@
 #include "dawn_native/metal/RenderPipelineMTL.h"
 #include "dawn_native/metal/SamplerMTL.h"
 #include "dawn_native/metal/TextureMTL.h"
+#include "base/logging.h"
 
 namespace dawn_native { namespace metal {
+
+    extern id<MTLDevice> g_mtl_device;
+    extern std::map<uint32_t, id<MTLBuffer>> g_mtl_buffer;
 
     struct GlobalEncoders {
         id<MTLBlitCommandEncoder> blit = nil;
@@ -556,6 +562,17 @@ namespace dawn_native { namespace metal {
             std::array<NSUInteger, kMaxVertexBuffers> mVertexBufferOffsets;
         };
 
+        // class AcquireBufferTracker {
+        //   public:
+        //     void OnSetAcquiredBuffers(uint32_t index,
+        //                             const Ref<BufferBase>* buffers) {
+        //       mAcquiredBuffers[index] = ToBackend(buffers[i].Get())->GetMTLBuffer();
+        //     }
+
+        //   private:
+        //     std::map<uint32_t, id<MTLBuffer>> mAcquiredBuffers;
+        // };
+
     }  // anonymous namespace
 
     CommandBuffer::CommandBuffer(CommandEncoderBase* encoder,
@@ -595,6 +612,19 @@ namespace dawn_native { namespace metal {
                                          toBuffer:ToBackend(copy->destination)->GetMTLBuffer()
                                 destinationOffset:copy->destinationOffset
                                              size:copy->size];
+                } break;
+
+                case Command::ShareBufferToWebml: {
+                    ShareBufferToWebmlCmd* copy = mCommands.NextCommand<ShareBufferToWebmlCmd>();
+                    id<MTLBuffer> mtlBuffer = ToBackend(copy->source)->GetMTLBuffer();
+                    // float* data = reinterpret_cast<float*>([mtlBuffer contents]);
+                    // LOG(ERROR) << "=========Command::ShareBufferToWebml " << 
+                    //     data[1] << " index = " << copy->index;
+
+                    g_mtl_buffer[copy->index] = mtlBuffer;
+
+                    Device* device = ToBackend(GetDevice());
+                    g_mtl_device = device->GetMTLDevice();
                 } break;
 
                 case Command::CopyBufferToTexture: {

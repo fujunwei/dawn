@@ -291,6 +291,13 @@
                 ]
             },
             {
+                "name": "share buffer to webml",
+                "args": [
+                    {"name": "source", "type": "buffer"},
+                    {"name": "index", "type": "uint32_t"}
+                ]
+            },
+            {
                 "name": "copy buffer to texture",
                 "args": [
                     {"name": "source", "type": "buffer copy view", "annotation": "const*"},

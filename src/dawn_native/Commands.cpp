@@ -42,6 +42,10 @@ namespace dawn_native {
                     CopyBufferToBufferCmd* copy = commands->NextCommand<CopyBufferToBufferCmd>();
                     copy->~CopyBufferToBufferCmd();
                 } break;
+                case Command::ShareBufferToWebml: {
+                    ShareBufferToWebmlCmd* copy = commands->NextCommand<ShareBufferToWebmlCmd>();
+                    copy->~ShareBufferToWebmlCmd();
+                } break;
                 case Command::CopyBufferToTexture: {
                     CopyBufferToTextureCmd* copy = commands->NextCommand<CopyBufferToTextureCmd>();
                     copy->~CopyBufferToTextureCmd();
@@ -170,6 +174,10 @@ namespace dawn_native {
 
             case Command::CopyBufferToBuffer:
                 commands->NextCommand<CopyBufferToBufferCmd>();
+                break;
+
+            case Command::ShareBufferToWebml:
+                commands->NextCommand<ShareBufferToWebmlCmd>();
                 break;
 
             case Command::CopyBufferToTexture:

@@ -17,14 +17,27 @@
 
 #include "dawn_native/MetalBackend.h"
 
+#include <map>
+
 #include "dawn_native/Texture.h"
 #include "dawn_native/metal/DeviceMTL.h"
 
 namespace dawn_native { namespace metal {
 
+    id<MTLDevice> g_mtl_device;
+    std::map<uint32_t, id<MTLBuffer>> g_mtl_buffer;
+
     id<MTLDevice> GetMetalDevice(DawnDevice cDevice) {
         Device* device = reinterpret_cast<Device*>(cDevice);
         return device->GetMTLDevice();
+    }
+
+    id<MTLDevice> GetSharedMetalDevice() {
+        return g_mtl_device;
+    }
+
+    std::map<uint32_t, id<MTLBuffer>> GetSharedMetalBuffer() {
+        return g_mtl_buffer;
     }
 
     DawnTexture WrapIOSurface(DawnDevice cDevice,

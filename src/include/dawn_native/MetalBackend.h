@@ -15,6 +15,7 @@
 #ifndef DAWNNATIVE_METALBACKEND_H_
 #define DAWNNATIVE_METALBACKEND_H_
 
+#include <map>
 #include <dawn/dawn_wsi.h>
 #include <dawn_native/DawnNative.h>
 
@@ -49,6 +50,10 @@ namespace dawn_native { namespace metal {
 #ifdef __OBJC__
 namespace dawn_native { namespace metal {
     DAWN_NATIVE_EXPORT id<MTLDevice> GetMetalDevice(DawnDevice device);
+
+    DAWN_NATIVE_EXPORT id<MTLDevice> GetSharedMetalDevice();
+
+    DAWN_NATIVE_EXPORT std::map<uint32_t, id<MTLBuffer>> GetSharedMetalBuffer();
 }}      // namespace dawn_native::metal
 #endif  // __OBJC__
 
