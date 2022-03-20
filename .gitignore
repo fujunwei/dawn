@@ -36,6 +36,8 @@
 /tools/cmake*
 /tools/golang
 /tools/memory
+/third_party/microsoft.ai.directml*
+/third_party/DirectML
 /out
 
 # Modified from https://www.gitignore.io/api/vim,macos,linux,emacs,windows,sublimetext,visualstudio,visualstudiocode,intellij
