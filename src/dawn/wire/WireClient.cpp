@@ -45,6 +45,14 @@ namespace dawn::wire {
         return mImpl->ReserveInstance();
     }
 
+    std::tuple<uint32_t, uint32_t> WireClient::GetDeviceId(WGPUDevice device) {
+        return mImpl->GetDeviceId(device);
+    }
+
+    std::tuple<uint32_t, uint32_t> WireClient::GetBufferId(WGPUBuffer buffer) {
+        return mImpl->GetBufferId(buffer);
+    }
+
     void WireClient::ReclaimTextureReservation(const ReservedTexture& reservation) {
         mImpl->ReclaimTextureReservation(reservation);
     }

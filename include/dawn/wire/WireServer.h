@@ -64,6 +64,7 @@ namespace dawn::wire {
         // work is made. Getting this list can be done by tracking the (id, generation) of
         // previously injected devices, and observing if GetDevice(id, generation) returns non-null.
         WGPUDevice GetDevice(uint32_t id, uint32_t generation);
+        WGPUBuffer GetBuffer(uint32_t id, uint32_t generation);
 
       private:
         std::unique_ptr<server::Server> mImpl;

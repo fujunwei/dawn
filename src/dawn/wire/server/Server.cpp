@@ -152,6 +152,14 @@ namespace dawn::wire::server {
         return data->handle;
     }
 
+    WGPUBuffer Server::GetBuffer(uint32_t id, uint32_t generation) {
+        ObjectData<WGPUBuffer>* data = BufferObjects().Get(id);
+        if (data == nullptr || data->generation != generation) {
+            return nullptr;
+        }
+        return data->handle;
+    }
+
     void Server::SetForwardingDeviceCallbacks(ObjectData<WGPUDevice>* deviceObject) {
         // Note: these callbacks are manually inlined here since they do not acquire and
         // free their userdata. Also unlike other callbacks, these are cleared and unset when

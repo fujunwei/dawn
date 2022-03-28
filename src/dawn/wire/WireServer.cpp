@@ -59,6 +59,10 @@ namespace dawn::wire {
         return mImpl->GetDevice(id, generation);
     }
 
+    WGPUBuffer WireServer::GetBuffer(uint32_t id, uint32_t generation) {
+        return mImpl->GetBuffer(id, generation);
+    }
+
     namespace server {
         MemoryTransferService::MemoryTransferService() = default;
 

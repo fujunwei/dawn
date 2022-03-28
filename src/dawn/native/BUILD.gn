@@ -13,11 +13,13 @@
 # limitations under the License.
 
 import("../../../scripts/dawn_overrides_with_defaults.gni")
+import("//third_party/webnn/scripts/webnn_overrides_with_defaults.gni")
 
 import("//build_overrides/build.gni")
 import("${dawn_root}/generator/dawn_generator.gni")
 import("${dawn_root}/scripts/dawn_component.gni")
 import("${dawn_root}/scripts/dawn_features.gni")
+import("//third_party/webnn/build_overrides/webnn_features.gni")
 
 # Import mac_deployment_target
 if (is_mac) {
@@ -732,49 +734,51 @@ dawn_component("native") {
   if (dawn_enable_d3d12) {
     sources += [ "d3d12/D3D12Backend.cpp" ]
 
-    # dml backend
-    sources += [
-      "dml/deps/src/dmldevice.cpp",
-      "dml/deps/src/model.h",
-      "dml/deps/src/precomp.h",
-      "dml/deps/src/typeconvert.h",
-      "dml/deps/src/util.cpp",
-      "dml/deps/src/util.h",
-    ]
+    if (webnn_enable_gpu_buffer) {
+      # dml backend
+      sources += [
+        "dml/deps/src/dmldevice.cpp",
+        "dml/deps/src/model.h",
+        "dml/deps/src/precomp.h",
+        "dml/deps/src/typeconvert.h",
+        "dml/deps/src/util.cpp",
+        "dml/deps/src/util.h",
+      ]
 
-    include_dirs = [
-      "${dawn_root}/",
-      "${dawn_root}/third_party/DirectML/Libraries",
-      "${dawn_root}/third_party/microsoft.ai.directml.1.5.1/include",
-    ]
+      include_dirs = [
+        "${dawn_root}/",
+        "${webnn_root}/third_party/DirectML/Libraries",
+        "${webnn_root}/third_party/microsoft.ai.directml.1.5.1/include",
+      ]
 
-    lib_dirs =
-        [ "${dawn_root}/third_party/microsoft.ai.directml.1.5.1/bin/x64-win" ]
+      lib_dirs =
+          [ "${webnn_root}/third_party/microsoft.ai.directml.1.5.1/bin/x64-win" ]
 
-    libs = [
-      "directml.lib",
-    ]
+      libs = [
+        "directml.lib",
+      ]
 
-    cflags = [
-      "/std:c++17",
-      "-Wno-address-of-temporary",
-      "-Wno-logical-not-parentheses",
-      "-Wno-macro-redefined",
-      # Allow the use of DEFINE_ENUM_FLAG_OPERATORS(ENUMTYPE); in DirectML.h
-      "-Wno-extra-semi",
+      cflags = [
+        "/std:c++17",
+        "-Wno-address-of-temporary",
+        "-Wno-logical-not-parentheses",
+        "-Wno-macro-redefined",
+        # Allow the use of DEFINE_ENUM_FLAG_OPERATORS(ENUMTYPE); in DirectML.h
+        "-Wno-extra-semi",
 
-      # Allow the use of DMLX_THROW(_hr); in DirectMLX.h
-      "-Wno-extra-semi-stmt",
+        # Allow the use of DMLX_THROW(_hr); in DirectMLX.h
+        "-Wno-extra-semi-stmt",
 
-      # Allow the use of DML_OPERATOR_GRAPH_NODE_DESC{ node.op.Get() } in DirectMLX.h
-      "-Wno-missing-field-initializers",
+        # Allow the use of DML_OPERATOR_GRAPH_NODE_DESC{ node.op.Get() } in DirectMLX.h
+        "-Wno-missing-field-initializers",
 
-      # Allow third_party/onnxruntime/include/onnxruntime/core/common/status.h(115,9):
-      # use of the 'nodiscard' attribute is a C++17 extension
-      "-Wno-c++17-extensions",
+        # Allow third_party/onnxruntime/include/onnxruntime/core/common/status.h(115,9):
+        # use of the 'nodiscard' attribute is a C++17 extension
+        "-Wno-c++17-extensions",
 
-      "-Wno-c++98-compat-extra-semi",
-    ]
+        "-Wno-c++98-compat-extra-semi",
+      ]
+    }
   }
   if (dawn_enable_metal) {
     sources += [ "metal/MetalBackend.mm" ]

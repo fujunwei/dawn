@@ -2063,7 +2063,8 @@ namespace dml
         Span<const uint32_t> windowSizes,
         Span<const uint32_t> startPadding,
         Span<const uint32_t> endPadding,
-        bool includePadding)
+        bool includePadding,
+        TensorDimensions outputSizes = {})
     {
         detail::GraphBuilder* builder = input.Impl()->GetGraphBuilder();
 
@@ -2073,15 +2074,17 @@ namespace dml
         assert(strides.size() == startPadding.size());
         assert(strides.size() == endPadding.size());
 
-        // Calculate output size
-        TensorDimensions outputSizes;
-        outputSizes.push_back(inputTensor.sizes[0]); // N
-        outputSizes.push_back(inputTensor.sizes[1]); // C
-        for (size_t i = 0; i < windowSizes.size(); ++i)
+        // Calculate output size, if not explicitly provided
+        if (outputSizes.empty())
         {
-            uint32_t paddedInputSize = inputTensor.sizes[2 + i] + startPadding[i] + endPadding[i];
-            uint32_t outputSize = (paddedInputSize - windowSizes[i]) / strides[i] + 1;
-            outputSizes.push_back(outputSize);
+            outputSizes.push_back(inputTensor.sizes[0]); // N
+            outputSizes.push_back(inputTensor.sizes[1]); // C
+            for (size_t i = 0; i < windowSizes.size(); ++i)
+            {
+                uint32_t paddedInputSize = inputTensor.sizes[2 + i] + startPadding[i] + endPadding[i];
+                uint32_t outputSize = (paddedInputSize - windowSizes[i]) / strides[i] + 1;
+                outputSizes.push_back(outputSize);
+            }
         }
 
         TensorDesc outputTensor(inputTensor.dataType, std::move(outputSizes), builder->GetTensorPolicy());
@@ -2128,7 +2131,8 @@ namespace dml
         Span<const uint32_t> startPadding = {},
         Span<const uint32_t> endPadding = {},
         Span<const uint32_t> dilations = {},
-        bool outputIndices = false)
+        bool outputIndices = false,
+        TensorDimensions outputSizes = {})
     {
         detail::GraphBuilder* builder = input.Impl()->GetGraphBuilder();
 
@@ -2150,16 +2154,18 @@ namespace dml
         startPadding = startPadding.empty() ? Span<const uint32_t>{ defaultPadding } : startPadding;
         endPadding = endPadding.empty() ? Span<const uint32_t>{ defaultPadding } : endPadding;
 
-        // Calculate output size
-        TensorDimensions outputSizes;
-        outputSizes.push_back(inputTensor.sizes[0]); // N
-        outputSizes.push_back(inputTensor.sizes[1]); // C
-        for (size_t i = 0; i < windowSize.size(); i++)
+        // Calculate output size, if not explicitly provided
+        if (outputSizes.empty())
         {
-            uint32_t paddedInputSize = inputTensor.sizes[2 + i] + startPadding[i] + endPadding[i];
-            uint32_t dilatedWindowSize = 1 + (windowSize[i] - 1) * dilations[i];
-            uint32_t outputSize = (dilatedWindowSize >= paddedInputSize) ? 1 : (paddedInputSize - dilatedWindowSize) / strides[i] + 1;
-            outputSizes.push_back(outputSize);
+            outputSizes.push_back(inputTensor.sizes[0]); // N
+            outputSizes.push_back(inputTensor.sizes[1]); // C
+            for (size_t i = 0; i < windowSize.size(); i++)
+            {
+                uint32_t paddedInputSize = inputTensor.sizes[2 + i] + startPadding[i] + endPadding[i];
+                uint32_t dilatedWindowSize = 1 + (windowSize[i] - 1) * dilations[i];
+                uint32_t outputSize = (dilatedWindowSize >= paddedInputSize) ? 1 : (paddedInputSize - dilatedWindowSize) / strides[i] + 1;
+                outputSizes.push_back(outputSize);
+            }
         }
 
         TensorDesc outputTensor(inputTensor.dataType, outputSizes, builder->GetTensorPolicy());

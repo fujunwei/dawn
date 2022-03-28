@@ -17,12 +17,12 @@
 #include <span>
 #endif
 
-#include "dawn_native/d3d12/d3d12_platform.h"
-#include "dawn_native/d3d12/DeviceD3D12.h"
-#include "dawn_native/d3d12/BufferD3D12.h"
-#include "dawn_native/d3d12/CommandRecordingContext.h"
-#include "dawn_native/Error.h"
-#include "dawn_native/ErrorData.h"
+#include "dawn/native/d3d12/d3d12_platform.h"
+#include "dawn/native/d3d12/DeviceD3D12.h"
+#include "dawn/native/d3d12/BufferD3D12.h"
+#include "dawn/native/d3d12/CommandRecordingContext.h"
+#include "dawn/native/Error.h"
+#include "dawn/native/ErrorData.h"
 
 #define DML_TARGET_VERSION_USE_LATEST 1
 #include <DirectML.h>

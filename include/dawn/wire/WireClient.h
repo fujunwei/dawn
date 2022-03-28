@@ -74,6 +74,8 @@ namespace dawn::wire {
         ReservedSwapChain ReserveSwapChain(WGPUDevice device);
         ReservedDevice ReserveDevice();
         ReservedInstance ReserveInstance();
+        std::tuple<uint32_t, uint32_t> GetDeviceId(WGPUDevice device);
+        std::tuple<uint32_t, uint32_t> GetBufferId(WGPUBuffer buffer);
 
         void ReclaimTextureReservation(const ReservedTexture& reservation);
         void ReclaimSwapChainReservation(const ReservedSwapChain& reservation);
