@@ -128,6 +128,18 @@ namespace dawn::wire::client {
         return result;
     }
 
+    std::tuple<uint32_t, uint32_t> Client::GetDeviceId(WGPUDevice device) {
+        uint32_t id = FromAPI(device)->id;
+        uint32_t generation = DeviceAllocator().GetGeneration(FromAPI(device)->id);
+        return {id, generation};
+    }
+
+    std::tuple<uint32_t, uint32_t> Client::GetBufferId(WGPUBuffer buffer) {
+        uint32_t id = FromAPI(buffer)->id;
+        uint32_t generation = BufferAllocator().GetGeneration(FromAPI(buffer)->id);
+        return {id, generation};
+    }
+
     void Client::ReclaimTextureReservation(const ReservedTexture& reservation) {
         TextureAllocator().Free(FromAPI(reservation.texture));
     }

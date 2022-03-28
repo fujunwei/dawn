@@ -170,6 +170,7 @@ namespace dawn::wire::server {
         bool InjectInstance(WGPUInstance instance, uint32_t id, uint32_t generation);
 
         WGPUDevice GetDevice(uint32_t id, uint32_t generation);
+        WGPUBuffer GetBuffer(uint32_t id, uint32_t generation);
 
         template <typename T,
                   typename Enable = std::enable_if<std::is_base_of<CallbackUserdata, T>::value>>

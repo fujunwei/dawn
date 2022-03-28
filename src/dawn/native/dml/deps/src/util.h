@@ -7,8 +7,8 @@
 #pragma once
 
 // Dawn assert
-#include "common/Assert.h"
-#include "common/Log.h"
+#include "dawn/common/Assert.h"
+#include "dawn/common/Log.h"
 
 #define FAILED(hr) (((HRESULT)(hr)) < 0)
 

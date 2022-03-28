@@ -179,18 +179,19 @@ HRESULT Device::DispatchOperator(
                 continue;
             }
 
-            DmlBufferTensorDesc bufferDesc = *inputs[i]->desc.AsPtr<DML_BUFFER_TENSOR_DESC>();
-            assert(inputs[i]->data.Size() == bufferDesc.totalTensorSizeInBytes);
-
             WGPUBuffer wgpuBuffer = inputs[i]->data.Get();
             dawn_native::d3d12::Buffer* inputBuffer = reinterpret_cast<dawn_native::d3d12::Buffer*>(wgpuBuffer);
             DAWN_TRY_WITH_HRESULT(inputBuffer->EnsureDataInitialized(commandRecordingContext));
             inputBuffer->TrackUsageAndTransitionNow(commandRecordingContext, wgpu::BufferUsage::CopySrc);
+            
+            DmlBufferTensorDesc bufferDesc = *inputs[i]->desc.AsPtr<DML_BUFFER_TENSOR_DESC>();
+            size_t inputSize = inputs[i]->data.Size() == 0 ? inputBuffer->GetSize() : inputs[i]->data.Size();
+            assert(inputSize == bufferDesc.totalTensorSizeInBytes);
 
             commandList->CopyBufferRegion(
                 m_inputsResource.Get(), inputBindings[i].offset,
                 inputBuffer->GetD3D12Resource(), inputs[i]->data.Offset(),
-                inputs[i]->data.Size());
+                inputSize);
         }
 
         commandList->ResourceBarrier(
@@ -272,10 +273,11 @@ HRESULT Device::DispatchOperator(
 
             dml::TensorDesc desc = *output->desc.AsPtr<DML_BUFFER_TENSOR_DESC>();
             DmlBufferTensorDesc bufferDesc = *desc.AsPtr<DML_BUFFER_TENSOR_DESC>();
-            assert(output->data.Size() == bufferDesc.totalTensorSizeInBytes);
 
             WGPUBuffer wgpuBuffer = output->data.Get();
             dawn_native::d3d12::Buffer* outputBuffer = reinterpret_cast<dawn_native::d3d12::Buffer*>(wgpuBuffer);
+            // size_t outputSize = output->data.Size() == 0 ? outputBuffer->GetSize() : output->data.Size();
+            // assert(outputSize == bufferDesc.totalTensorSizeInBytes);
             bool cleared;
             DAWN_TRY_ASSIGN_WITH_CLEANUP(cleared,
                             outputBuffer->EnsureDataInitializedAsDestination(
@@ -391,18 +393,18 @@ HRESULT Device::InitializeOperator(
                 continue;
             }
 
-            DmlBufferTensorDesc bufferDesc = *inputs[i]->desc.AsPtr<DML_BUFFER_TENSOR_DESC>();
-            assert(inputs[i]->data.Size() == bufferDesc.totalTensorSizeInBytes);
-
             WGPUBuffer wgpuBuffer = inputs[i]->data.Get();
             dawn_native::d3d12::Buffer* inputBuffer = reinterpret_cast<dawn_native::d3d12::Buffer*>(wgpuBuffer);
+            DmlBufferTensorDesc bufferDesc = *inputs[i]->desc.AsPtr<DML_BUFFER_TENSOR_DESC>();
+            size_t inputSize = inputs[i]->data.Size() == 0 ? inputBuffer->GetSize() : inputs[i]->data.Size();
+            assert(inputSize== bufferDesc.totalTensorSizeInBytes);
             DAWN_TRY_WITH_HRESULT(inputBuffer->EnsureDataInitialized(commandRecordingContext));
             inputBuffer->TrackUsageAndTransitionNow(commandRecordingContext, wgpu::BufferUsage::CopySrc);
 
             commandList->CopyBufferRegion(
                 m_inputsResource.Get(), inputBinding.bindings[i].offset,
                 inputBuffer->GetD3D12Resource(), inputs[i]->data.Offset(),
-                inputs[i]->data.Size());
+                inputSize);
         }
 
         commandList->ResourceBarrier(
