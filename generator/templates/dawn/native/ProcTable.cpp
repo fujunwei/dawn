@@ -129,31 +129,38 @@ namespace {{native_namespace}} {
 
     }  // anonymous namespace
 
-    WGPUProc NativeGetProcAddress(WGPUDevice, const char* procName) {
-        if (procName == nullptr) {
+    {% for function in by_category["function"] if function.name.canonical_case() != "get proc address" %}
+        {{as_cType(function.return_type.name)}} Native{{function.name.CamelCase()}}(
+            {%- for arg in function.arguments -%}
+                {%- if not loop.first %}, {% endif -%}
+                {{as_annotated_cType(arg)}}
+            {%- endfor -%}
+        ) {
+            if (procName == nullptr) {
+                return nullptr;
+            }
+
+            const ProcEntry* entry = std::lower_bound(&sProcMap[0], &sProcMap[sProcMapSize], procName,
+                [](const ProcEntry &a, const char *b) -> bool {
+                    return strcmp(a.name, b) < 0;
+                }
+            );
+
+            if (entry != &sProcMap[sProcMapSize] && strcmp(entry->name, procName) == 0) {
+                return entry->proc;
+            }
+
+            // Special case the free-standing functions of the API.
+            // TODO(dawn:1238) Checking string one by one is slow, it needs to be optimized.
+            {% for function in by_category["function"] %}
+                if (strcmp(procName, "{{as_cMethod(None, function.name)}}") == 0) {
+                    return reinterpret_cast<{{c_prefix}}Proc>(Native{{as_cppType(function.name)}});
+                }
+
+            {% endfor %}
             return nullptr;
         }
-
-        const ProcEntry* entry = std::lower_bound(&sProcMap[0], &sProcMap[sProcMapSize], procName,
-            [](const ProcEntry &a, const char *b) -> bool {
-                return strcmp(a.name, b) < 0;
-            }
-        );
-
-        if (entry != &sProcMap[sProcMapSize] && strcmp(entry->name, procName) == 0) {
-            return entry->proc;
-        }
-
-        // Special case the free-standing functions of the API.
-        // TODO(dawn:1238) Checking string one by one is slow, it needs to be optimized.
-        {% for function in by_category["function"] %}
-            if (strcmp(procName, "{{as_cMethod(None, function.name)}}") == 0) {
-                return reinterpret_cast<{{c_prefix}}Proc>(Native{{as_cppType(function.name)}});
-            }
-
-        {% endfor %}
-        return nullptr;
-    }
+    {% endfor %}
 
     std::vector<const char*> GetProcMapNamesForTestingInternal() {
         std::vector<const char*> result;

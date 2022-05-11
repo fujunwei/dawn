@@ -12,7 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "dawn/{{metadata.api.lower()}}.h"
+{% set dir = metadata.proc_table_prefix.lower() %}
+#include "{{dir}}/{{metadata.api.lower()}}.h"
 
 namespace dawn::native {
 

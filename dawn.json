@@ -23,6 +23,7 @@
         "namespace": "wgpu",
         "proc_table_prefix": "Dawn",
         "native_namespace": "dawn native",
+        "wire_namespace": "wire native",
         "copyright_year": "2019"
     },
 

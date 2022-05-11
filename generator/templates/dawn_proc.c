@@ -14,7 +14,8 @@
 
 {% set Prefix = metadata.proc_table_prefix %}
 {% set prefix = Prefix.lower() %}
-#include "dawn/{{prefix}}_proc.h"
+{% set dir = prefix %}
+#include "{{dir}}/{{prefix}}_proc.h"
 
 static {{Prefix}}ProcTable procs;
 
